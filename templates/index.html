@@ -24,7 +24,7 @@
     <header class="site-header">
         <h1>{{ config.site.title }}</h1>
         <p class="site-description">{{ config.site.description }}</p>
-        <p class="site-author">by {{ config.site.author }}</p>
+        <p class="site-author">{{ config.site.get('subtitle', 'by ' + config.site.author).replace('{author}', config.site.author) }}</p>
     </header>
 
     <main class="albums-container">
