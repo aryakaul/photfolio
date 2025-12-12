@@ -1,4 +1,4 @@
-# Photfolio
+# <a href="https://aryakaul.github.io/photfolio">Photfolio</a>
 
 A minimal, performance-focused photography portfolio generator. Drop your photos in a folder, run a build script, and get a beautiful static website.
 
