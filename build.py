@@ -8,6 +8,7 @@ import os
 import shutil
 import yaml
 from pathlib import Path
+from datetime import datetime
 from PIL import Image
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
@@ -177,7 +178,8 @@ class PhotfolioBuilder:
         template = self.env.get_template('index.html')
         html = template.render(
             config=self.config,
-            albums=albums_data
+            albums=albums_data,
+            now=datetime.now()
         )
 
         with open(self.build_dir / 'index.html', 'w') as f:
@@ -190,7 +192,8 @@ class PhotfolioBuilder:
                 config=self.config,
                 album_name=album_name,
                 photos=photos,
-                all_albums=list(albums_data.keys())
+                all_albums=list(albums_data.keys()),
+                now=datetime.now()
             )
 
             album_file = self.build_dir / f"{album_name.lower().replace(' ', '-')}.html"

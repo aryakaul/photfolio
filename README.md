@@ -89,12 +89,52 @@ python -m http.server 8000
 
 See `config.yaml` for all options:
 
-- **Site info**: Title, author, description
-- **Portfolio settings**: Grid columns, image quality, max dimensions
+- **Site info**: Title, author, description, favicon
+- **Portfolio settings**: Grid columns, image quality, max dimensions, filename handling
 - **Metadata**: EXIF stripping and display options
 - **Theme**: Colors, fonts
+- **Footer**: Custom text, links
 - **Albums**: Sorting, descriptions
 - **Advanced**: Image formats, lazy loading, progressive JPEGs
+
+### Footer Customization
+
+Customize your footer via `config.yaml`:
+
+**Basic copyright:**
+```yaml
+footer:
+  text: "&copy; {year} {author}"
+```
+Output: `© 2025 Your Name`
+
+**Custom text:**
+```yaml
+footer:
+  text: "All rights reserved • {author} • {year}"
+```
+Output: `All rights reserved • Your Name • 2025`
+
+**With social links:**
+```yaml
+footer:
+  text: "&copy; {year} {author}"
+  links:
+    - label: "Instagram"  # Displays Instagram icon
+      url: "https://instagram.com/yourhandle"
+    - label: "Email"      # Displays email icon
+      url: "mailto:your@email.com"
+```
+
+**Supported icon labels:** Links with labels "Instagram" or "Email" automatically render as icons instead of text. Other labels display as text.
+
+**No footer:**
+```yaml
+footer:
+  text: ""
+```
+
+Available variables: `{year}` (current year), `{author}` (from site.author)
 
 ## Deployment
 

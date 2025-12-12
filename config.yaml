@@ -58,7 +58,24 @@ theme:
   accent: "#888888"
 
   # Font family (will fall back to system fonts)
-  font: "system-ui, -apple-system, sans-serif"
+  font: "arial, system-ui, -apple-system, sans-serif"
+
+# Footer Settings
+footer:
+  # Footer text template
+  # Available variables: {year}, {author}
+  # Leave empty to hide footer entirely
+  text: "&copy; {author} now-forever"
+
+  # Optional links to display in footer
+  # Each link will be displayed as "Label" with href
+  links:
+    - label: "Instagram"
+      url: "https://instagram.com/yourhandle"
+    - label: "Email"
+      url: "mailto:your@email.com"
+    # - label: "Website"
+    #   url: "https://yourwebsite.com"
 
 # Album Settings
 albums:
