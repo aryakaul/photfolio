@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A collection of your photographic work">
+    <title>Photfolio Example</title>
+    
+    <link rel="icon" href='data:image/gif;base64,R0lGODlhKgAtAPMJADMzmTNmzJn//////8zMzDMzM5mZmWZmZgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAUAAAkALAAAAAAqAC0AAAT/MMlJq7046827/2AojmRpekiqqqe2vm32rnGlDjihGzxb37ldL1VLAAc6As/gMx2TUCGTSHpGk8umyHpVDhGcmXhMJk/K6PTsrG6j2QgcUleoqw74fF5VL2C/cHJJfXd6enx1f1NgElyEKYaHKX2KTWR5S3ICm0tLe2NwM5g8mpydBp9ioS+jBqUCp6h4Zo0pWZB4S4oAvJ6zk3ZURrZfrbu9PKmPjMMItwjGUrwAvgeIBZbEi60B3dNHysHMKs/c3rzgvwjLcOW5PN0B3yly4djC5MnqrZk4qXnsajnTZw3XgVj19uEJ2KxaoYOnEhaEtlBcO4LLItkDaFFgtYwaIyf24XhvnDaSDyNdQ4nPjUtVAl/KNDlTZpGbOHPq3Mmz54YIADs='>
+    
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-color: #888888;
+            --font-family: system-ui, -apple-system, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <h1>Photfolio Example</h1>
+        <p class="site-description">A collection of your photographic work</p>
+        <p class="site-author">by You?</p>
+    </header>
+
+    <main class="albums-container">
+        
+            
+            <div class="albums-grid">
+                
+                <article class="album-card">
+                    <a href="gordon-parks.html" class="album-link">
+                        <div class="album-cover">
+                            
+                            <picture>
+                                
+                                <source srcset="images/thumbs/Gordon Parks/airlineterminalATL.webp" type="image/webp">
+                                
+                                <img
+                                    src="images/thumbs/Gordon Parks/airlineterminalATL.webp"
+                                    alt="Gordon Parks"
+                                    
+                                >
+                            </picture>
+                        </div>
+                        <div class="album-info">
+                            <h2>Gordon Parks</h2>
+                            <p class="album-count">7 photos</p>
+                        </div>
+                    </a>
+                </article>
+                
+            </div>
+        
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; You?</p>
+    </footer>
+
+    <script>
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', function(e) {
+            // Only handle keys when lightbox is open
+            if (!window.location.hash.startsWith('#photo-')) return;
+
+            const currentHash = window.location.hash;
+            const match = currentHash.match(/#photo-(\d+)/);
+            if (!match) return;
+
+            // Handle Escape key to close lightbox
+            if (e.key === 'Escape') {
+                window.location.hash = '';
+                e.preventDefault();
+                return;
+            }
+
+            const currentIndex = parseInt(match[1]);
+            
+            const totalPhotos = 0; // No keyboard nav on album grid page
+            
+
+            if (totalPhotos === 0) return;
+
+            let nextIndex = currentIndex;
+
+            if (e.key === 'ArrowLeft') {
+                // Previous photo, loop to end if at start
+                nextIndex = currentIndex > 1 ? currentIndex - 1 : totalPhotos;
+                e.preventDefault();
+            } else if (e.key === 'ArrowRight') {
+                // Next photo, loop to start if at end
+                nextIndex = currentIndex < totalPhotos ? currentIndex + 1 : 1;
+                e.preventDefault();
+            } else {
+                return;
+            }
+
+            window.location.hash = '#photo-' + nextIndex;
+        });
+    </script>
+</body>
+</html>

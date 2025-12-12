@@ -1,10 +1,6 @@
 # Agent documentation (local context only)
 AGENT*.md
 
-# Build output
-build/
-dist/
-
 # Python
 __pycache__/
 *.py[cod]
