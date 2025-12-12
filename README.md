@@ -118,7 +118,7 @@ Or use GitHub Actions to automate the build process.
 photfolio/
 ├── photos/           # Source photos (add your images here)
 ├── assets/           # Static assets (favicon, logos, etc.)
-├── docs/            # Generated site (git-ignored)
+├── docs/             # Generated site (git-ignored)
 ├── templates/        # HTML templates (Jinja2)
 │   ├── index.html    # Main page / album grid
 │   └── album.html    # Individual album view
