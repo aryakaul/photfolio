@@ -20,7 +20,7 @@ class PhotfolioBuilder:
             self.config = yaml.safe_load(f)
 
         self.photos_dir = Path("photos")
-        self.build_dir = Path("build")
+        self.build_dir = Path("docs")
         self.templates_dir = Path("templates")
         self.styles_dir = Path("styles")
 

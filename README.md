@@ -77,10 +77,10 @@ python build.py
 
 ### 5. Preview
 
-Open `build/index.html` in your browser, or serve locally:
+Open `docs/index.html` in your browser, or serve locally:
 
 ```bash
-cd build
+cd docs
 python -m http.server 8000
 # Visit http://localhost:8000
 ```
@@ -101,7 +101,7 @@ See `config.yaml` for all options:
 ### GitHub Pages
 
 1. Build your site: `python build.py`
-2. Copy `build/` contents to your GitHub Pages repository
+2. Copy `docs/` contents to your GitHub Pages repository
 3. Commit and push
 
 Or use GitHub Actions to automate the build process.
@@ -109,7 +109,7 @@ Or use GitHub Actions to automate the build process.
 ### Self-Hosted
 
 1. Build your site: `python build.py`
-2. Upload `build/` directory to your web server
+2. Upload `docs/` directory to your web server
 3. Point your domain to the directory
 
 ## Project Structure
@@ -118,7 +118,7 @@ Or use GitHub Actions to automate the build process.
 photfolio/
 ├── photos/           # Source photos (add your images here)
 ├── assets/           # Static assets (favicon, logos, etc.)
-├── build/            # Generated site (git-ignored)
+├── docs/            # Generated site (git-ignored)
 ├── templates/        # HTML templates (Jinja2)
 │   ├── index.html    # Main page / album grid
 │   └── album.html    # Individual album view
@@ -136,7 +136,7 @@ photfolio/
 3. **Process**: Generates thumbnails, resized images, WebP versions
 4. **Optimize**: Strips EXIF (if configured), optimizes compression
 5. **Generate**: Renders HTML from templates with image data
-6. **Output**: Static site in `build/` ready to deploy
+6. **Output**: Static site in `docs/` ready to deploy
 
 ## Performance
 
