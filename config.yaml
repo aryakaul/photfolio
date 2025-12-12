@@ -1,0 +1,84 @@
+# Photfolio Configuration
+
+# Site Information
+site:
+  title: "Photfolio Example"
+  author: "You?"
+  description: "A collection of your photographic work"
+  url: "https://yourusername.github.io/photfolio"  # Used for GitHub Pages
+
+  # Favicon (website icon)
+  # Path relative to assets directory (e.g., "favicon.png")
+  # Leave empty ("") to use the default embedded icon
+  # Recommended formats: favicon.png, favicon.ico, or favicon.svg
+  favicon: ""
+
+# Portfolio Settings
+portfolio:
+  # Number of columns in gallery grid (responsive breakpoints will adjust)
+  grid_columns: 3
+
+  # Image quality for generated thumbnails (1-100)
+  thumbnail_quality: 85
+
+  # Maximum dimensions for full-size images (px)
+  max_image_width: 2000
+  max_image_height: 2000
+
+  # Generate WebP versions for better compression
+  generate_webp: true
+
+  # Keep original filenames or use sequential numbering
+  # true: Preserve original filenames (e.g., "sunset.jpg", "portrait.jpg")
+  # false: Use sequential numbering (e.g., "photo-001.jpg", "photo-002.jpg")
+  keep_original_filenames: true
+
+# Metadata Options
+metadata:
+  # Strip all EXIF data from generated images
+  strip_exif: true
+
+  # If false, preserve and optionally display:
+  # - Camera model
+  # - Lens
+  # - Settings (aperture, shutter, ISO)
+  # - Date taken
+  # - Location (if present)
+  display_exif: false
+
+# Appearance
+theme:
+  # Background color
+  background: "#000000"
+
+  # Text color
+  text: "#ffffff"
+
+  # Accent color (links, borders)
+  accent: "#888888"
+
+  # Font family (will fall back to system fonts)
+  font: "system-ui, -apple-system, sans-serif"
+
+# Album Settings
+albums:
+  # Sort order: 'name' or 'date'
+  sort_by: "name"
+
+  # Show album descriptions from album.txt files
+  show_descriptions: true
+
+# Advanced Settings
+advanced:
+  # Image formats to process
+  image_extensions:
+    - .jpg
+    - .jpeg
+    - .png
+    - .webp
+
+  # Lazy loading for images
+  lazy_load: true
+
+  # Generate progressive JPEGs
+  progressive_jpeg: true

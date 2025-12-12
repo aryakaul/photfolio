@@ -1,0 +1,30 @@
+# Agent documentation (local context only)
+AGENT*.md
+
+# Build output
+build/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Image processing cache
+.image_cache/

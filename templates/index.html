@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ config.site.description }}">
+    <title>{{ config.site.title }}</title>
+    {% if config.site.favicon %}
+    <link rel="icon" type="image/png" href="assets/{{ config.site.favicon }}">
+    {% else %}
+    <link rel="icon" href='data:image/gif;base64,R0lGODlhKgAtAPMJADMzmTNmzJn//////8zMzDMzM5mZmWZmZgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAUAAAkALAAAAAAqAC0AAAT/MMlJq7046827/2AojmRpekiqqqe2vm32rnGlDjihGzxb37ldL1VLAAc6As/gMx2TUCGTSHpGk8umyHpVDhGcmXhMJk/K6PTsrG6j2QgcUleoqw74fF5VL2C/cHJJfXd6enx1f1NgElyEKYaHKX2KTWR5S3ICm0tLe2NwM5g8mpydBp9ioS+jBqUCp6h4Zo0pWZB4S4oAvJ6zk3ZURrZfrbu9PKmPjMMItwjGUrwAvgeIBZbEi60B3dNHysHMKs/c3rzgvwjLcOW5PN0B3yly4djC5MnqrZk4qXnsajnTZw3XgVj19uEJ2KxaoYOnEhaEtlBcO4LLItkDaFFgtYwaIyf24XhvnDaSDyNdQ4nPjUtVAl/KNDlTZpGbOHPq3Mmz54YIADs='>
+    {% endif %}
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        :root {
+            --bg-color: {{ config.theme.background }};
+            --text-color: {{ config.theme.text }};
+            --accent-color: {{ config.theme.accent }};
+            --font-family: {{ config.theme.font }};
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <h1>{{ config.site.title }}</h1>
+        <p class="site-description">{{ config.site.description }}</p>
+        <p class="site-author">by {{ config.site.author }}</p>
+    </header>
+
+    <main class="albums-container">
+        {% if albums|length == 1 and 'Main' in albums %}
+            {# Single album - show photos directly #}
+            <section class="gallery">
+                {% for photo in albums['Main'] %}
+                <div class="gallery-item">
+                    <a href="#photo-{{ loop.index }}" class="photo-link">
+                        <picture>
+                            {% if photo.thumb_webp %}
+                            <source srcset="{{ photo.thumb_webp }}" type="image/webp">
+                            {% endif %}
+                            <img
+                                src="{{ photo.thumb }}"
+                                alt="Photo {{ loop.index }}"
+                                {% if config.advanced.lazy_load and loop.index > 6 %}loading="lazy"{% endif %}
+                                width="{{ photo.width }}"
+                                height="{{ photo.height }}"
+                            >
+                        </picture>
+                    </a>
+
+                    {# Lightbox modal #}
+                    <div id="photo-{{ loop.index }}" class="lightbox">
+                        <a href="#" class="lightbox-close">&times;</a>
+                        <div class="lightbox-content">
+                            <picture>
+                                {% if photo.full_webp %}
+                                <source srcset="{{ photo.full_webp }}" type="image/webp">
+                                {% endif %}
+                                <img src="{{ photo.full }}" alt="Photo {{ loop.index }}">
+                            </picture>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+        {% else %}
+            {# Multiple albums - show album grid #}
+            <div class="albums-grid">
+                {% for album_name, photos in albums.items() %}
+                <article class="album-card">
+                    <a href="{{ album_name.lower().replace(' ', '-') }}.html" class="album-link">
+                        <div class="album-cover">
+                            {% set cover_photo = photos[0] %}
+                            <picture>
+                                {% if cover_photo.thumb_webp %}
+                                <source srcset="{{ cover_photo.thumb_webp }}" type="image/webp">
+                                {% endif %}
+                                <img
+                                    src="{{ cover_photo.thumb }}"
+                                    alt="{{ album_name }}"
+                                    {% if loop.index > 3 %}loading="lazy"{% endif %}
+                                >
+                            </picture>
+                        </div>
+                        <div class="album-info">
+                            <h2>{{ album_name }}</h2>
+                            <p class="album-count">{{ photos|length }} photo{% if photos|length != 1 %}s{% endif %}</p>
+                        </div>
+                    </a>
+                </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; {{ config.site.author }}</p>
+    </footer>
+
+    <script>
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', function(e) {
+            // Only handle keys when lightbox is open
+            if (!window.location.hash.startsWith('#photo-')) return;
+
+            const currentHash = window.location.hash;
+            const match = currentHash.match(/#photo-(\d+)/);
+            if (!match) return;
+
+            // Handle Escape key to close lightbox
+            if (e.key === 'Escape') {
+                window.location.hash = '';
+                e.preventDefault();
+                return;
+            }
+
+            const currentIndex = parseInt(match[1]);
+            {% if albums|length == 1 and 'Main' in albums %}
+            const totalPhotos = {{ albums['Main']|length }};
+            {% else %}
+            const totalPhotos = 0; // No keyboard nav on album grid page
+            {% endif %}
+
+            if (totalPhotos === 0) return;
+
+            let nextIndex = currentIndex;
+
+            if (e.key === 'ArrowLeft') {
+                // Previous photo, loop to end if at start
+                nextIndex = currentIndex > 1 ? currentIndex - 1 : totalPhotos;
+                e.preventDefault();
+            } else if (e.key === 'ArrowRight') {
+                // Next photo, loop to start if at end
+                nextIndex = currentIndex < totalPhotos ? currentIndex + 1 : 1;
+                e.preventDefault();
+            } else {
+                return;
+            }
+
+            window.location.hash = '#photo-' + nextIndex;
+        });
+    </script>
+</body>
+</html>
