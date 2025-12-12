@@ -20,8 +20,11 @@ class PhotfolioBuilder:
         with open(config_path, 'r') as f:
             self.config = yaml.safe_load(f)
 
-        self.photos_dir = Path("photos")
-        self.build_dir = Path("docs")
+        # Get configurable directories from config, with defaults
+        self.photos_dir = Path(self.config.get('directories', {}).get('source', 'photos'))
+        self.build_dir = Path(self.config.get('directories', {}).get('target', 'docs'))
+
+        # Keep these hardcoded (part of codebase)
         self.templates_dir = Path("templates")
         self.styles_dir = Path("styles")
 
