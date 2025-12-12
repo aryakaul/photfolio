@@ -19,7 +19,7 @@ Place your photography here to generate your portfolio site.
 
 1. Add your photos to this directory (or create a symlink to your photo library)
 2. Run `python build.py` to generate the static site
-3. Output will be in `build/` directory
+3. Output will be in `docs/` directory
 
 ## Tips
 
