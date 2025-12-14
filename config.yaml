@@ -46,6 +46,11 @@ portfolio:
   # false: Use sequential numbering (e.g., "photo-001.jpg", "photo-002.jpg")
   keep_original_filenames: true
 
+  # Border width as proportion of image's smaller dimension (0 = no border)
+  # Applied to all images after resizing (outside max dimensions)
+  # Example: 0.02 = 2% border (400px image gets 8px, 2000px image gets 40px)
+  border_width: 0.02
+
 # Metadata Options
 metadata:
   # Strip all EXIF data from generated images
