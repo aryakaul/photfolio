@@ -23,18 +23,56 @@
 <body>
     <header class="site-header">
         <nav class="breadcrumb">
-            <a href="index.html">{{ config.site.title }}</a>
-            <span class="separator">/</span>
-            <span class="current">{{ album_name }}</span>
+            {% for crumb in breadcrumb %}
+                {% if loop.last %}
+                    <span class="current">{{ crumb.name }}</span>
+                {% else %}
+                    <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                    <span class="separator">/</span>
+                {% endif %}
+            {% endfor %}
         </nav>
     </header>
 
     <main>
         <section class="album-header">
             <h1>{{ album_name }}</h1>
+            {% if photos %}
             <p class="photo-count">{{ photos|length }} photo{% if photos|length != 1 %}s{% endif %}</p>
+            {% endif %}
         </section>
 
+        {# Show sub-albums if this is a parent album #}
+        {% if has_subalbums %}
+        <section class="sub-albums">
+            <h2>Albums in {{ album_name }}</h2>
+            <div class="albums-grid">
+                {% for subalbum_name, subalbum in subalbums.items() %}
+                <article class="album-card">
+                    <a href="{{ (subalbum.path | lower | replace(' ', '-') | replace('/', '-')) }}.html" class="album-link">
+                        <div class="album-cover">
+                            {% if subalbum.photos %}
+                                {% set cover_photo = subalbum.photos[0] %}
+                                <picture>
+                                    {% if cover_photo.thumb_webp %}
+                                    <source srcset="{{ cover_photo.thumb_webp }}" type="image/webp">
+                                    {% endif %}
+                                    <img src="{{ cover_photo.thumb }}" alt="{{ subalbum_name }}">
+                                </picture>
+                            {% endif %}
+                        </div>
+                        <div class="album-info">
+                            <h2>{{ subalbum_name }}</h2>
+                            <p class="album-count">{{ subalbum.photos|length }} photo{% if subalbum.photos|length != 1 %}s{% endif %}</p>
+                        </div>
+                    </a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if photos %}
         <section class="gallery">
             {% for photo in photos %}
             <div class="gallery-item">
@@ -86,6 +124,7 @@
             </div>
             {% endfor %}
         </section>
+        {% endif %}
 
         {# Album navigation if multiple albums exist #}
         {% if all_albums|length > 1 %}

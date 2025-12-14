@@ -45,10 +45,10 @@ class PhotfolioBuilder:
 
     def scan_photos(self):
         """
-        Scan photos/ directory and organize into albums
-        Returns: dict of {album_name: [photo_paths]}
+        Scan photos/ directory and organize into nested album structure
+        Returns: dict of nested albums
         """
-        albums = defaultdict(list)
+        albums = {}
         extensions = tuple(self.config['advanced']['image_extensions'])
 
         # Check if photos directory exists
@@ -63,18 +63,39 @@ class PhotfolioBuilder:
                 if item.name == "README.md":
                     continue
 
-                # Determine album name
                 relative = item.relative_to(self.photos_dir)
-                if len(relative.parts) > 1:
-                    # Photo is in subdirectory - use as album name
-                    album_name = relative.parts[0]
+                self._add_photo_to_nested_structure(albums, relative, item)
+
+        return albums
+
+    def _add_photo_to_nested_structure(self, albums, relative_path, photo_path):
+        """Recursively add photo to nested album structure"""
+        if len(relative_path.parts) == 1:
+            # Photo in root -> "Main" album
+            if 'Main' not in albums:
+                albums['Main'] = {'name': 'Main', 'path': 'main', 'photos': [], 'subalbums': {}}
+            albums['Main']['photos'].append(photo_path)
+        else:
+            # Photo in subdirectory
+            parts = relative_path.parts[:-1]  # All except filename
+            current = albums
+            path_so_far = []
+
+            for part in parts:
+                path_so_far.append(part)
+                if part not in current:
+                    current[part] = {
+                        'name': part,
+                        'path': '/'.join(path_so_far),
+                        'photos': [],
+                        'subalbums': {}
+                    }
+                if len(path_so_far) == len(parts):
+                    # Final level - add photo here
+                    current[part]['photos'].append(photo_path)
                 else:
-                    # Photo is in root - use "Main" album
-                    album_name = "Main"
-
-                albums[album_name].append(item)
-
-        return dict(albums)
+                    # Intermediate level - descend
+                    current = current[part]['subalbums']
 
     def add_border_to_image(self, image, border_width):
         """
@@ -100,7 +121,7 @@ class PhotfolioBuilder:
             print("Continuing without border...")
             return image
 
-    def process_image(self, source_path, album_name, photo_index=1):
+    def process_image(self, source_path, album_path, photo_index=1):
         """
         Process a single image: resize, optimize, strip EXIF
         Returns: dict with image info for template
@@ -115,11 +136,11 @@ class PhotfolioBuilder:
             stem = f"photo-{photo_index:03d}"
             filename = stem + extension
 
-        # Create album subdirectory in build
-        album_dir = self.images_dir / album_name
-        album_thumbs_dir = self.thumbs_dir / album_name
-        album_dir.mkdir(exist_ok=True)
-        album_thumbs_dir.mkdir(exist_ok=True)
+        # Create nested album directory structure
+        album_dir = self.images_dir / album_path
+        album_thumbs_dir = self.thumbs_dir / album_path
+        album_dir.mkdir(parents=True, exist_ok=True)
+        album_thumbs_dir.mkdir(parents=True, exist_ok=True)
 
         full_path = album_dir / filename
         thumb_path = album_thumbs_dir / filename
@@ -210,16 +231,16 @@ class PhotfolioBuilder:
         # Build image info dictionary
         img_info = {
             'filename': filename,
-            'full': f"images/{album_name}/{filename}",
-            'thumb': f"images/thumbs/{album_name}/{filename}",
+            'full': f"images/{album_path}/{filename}",
+            'thumb': f"images/thumbs/{album_path}/{filename}",
             'width': full_img.width,
             'height': full_img.height,
             'exif': exif_data
         }
 
         if webp_full_path:
-            img_info['full_webp'] = f"images/{album_name}/{stem}.webp"
-            img_info['thumb_webp'] = f"images/thumbs/{album_name}/{stem}.webp"
+            img_info['full_webp'] = f"images/{album_path}/{stem}.webp"
+            img_info['thumb_webp'] = f"images/thumbs/{album_path}/{stem}.webp"
 
         return img_info
 
@@ -236,31 +257,91 @@ class PhotfolioBuilder:
         if assets_dir.exists():
             shutil.copytree(assets_dir, assets_dest)
 
-        # Render index page (all albums)
+        # Render index page (only top-level albums)
         template = self.env.get_template('index.html')
         html = template.render(
             config=self.config,
             albums=albums_data,
             now=datetime.now()
         )
-
         with open(self.build_dir / 'index.html', 'w') as f:
             f.write(html)
 
-        # Render individual album pages
+        # Recursively render all album pages
+        self._render_album_pages(albums_data, albums_data)
+
+    def _render_album_pages(self, current_level, all_albums):
+        """Recursively generate HTML for each album"""
         album_template = self.env.get_template('album.html')
-        for album_name, photos in albums_data.items():
+
+        for album_name, album_node in current_level.items():
+            has_subalbums = bool(album_node['subalbums'])
+
             html = album_template.render(
                 config=self.config,
-                album_name=album_name,
-                photos=photos,
-                all_albums=list(albums_data.keys()),
+                album_name=album_node['name'],
+                album_path=album_node['path'],
+                photos=album_node['photos'],
+                subalbums=album_node['subalbums'] if has_subalbums else None,
+                breadcrumb=self._build_breadcrumb(album_node['path']),
+                has_subalbums=has_subalbums,
+                all_albums=all_albums,
                 now=datetime.now()
             )
 
-            album_file = self.build_dir / f"{album_name.lower().replace(' ', '-')}.html"
+            # Write to file: travel/spain -> travel-spain.html
+            album_slug = album_node['path'].lower().replace(' ', '-').replace('/', '-')
+            album_file = self.build_dir / f"{album_slug}.html"
             with open(album_file, 'w') as f:
                 f.write(html)
+
+            # Recurse into subalbums
+            if album_node['subalbums']:
+                self._render_album_pages(album_node['subalbums'], all_albums)
+
+    def _build_breadcrumb(self, album_path):
+        """Generate breadcrumb navigation chain"""
+        breadcrumb = [{'name': 'Home', 'url': 'index.html'}]
+
+        if album_path == 'main':
+            # For main album, show Home (link) / Main (current)
+            breadcrumb.append({'name': 'Main', 'url': 'main.html'})
+            return breadcrumb
+
+        parts = album_path.split('/')
+        for i, part in enumerate(parts):
+            path_slug = '-'.join(parts[:i+1]).lower().replace(' ', '-')
+            breadcrumb.append({
+                'name': part.capitalize(),
+                'url': f"{path_slug}.html"
+            })
+
+        return breadcrumb
+
+    def _process_albums_recursive(self, albums_node, parent_path=""):
+        """Recursively process all albums and sub-albums"""
+        result = {}
+        for album_name, album_info in albums_node.items():
+            album_path = album_info['path']
+
+            print(f"Processing album '{album_path}'...")
+            processed_photos = []
+            for idx, photo_path in enumerate(album_info['photos'], start=1):
+                print(f"  - {photo_path.name}")
+                img_info = self.process_image(photo_path, album_path, photo_index=idx)
+                processed_photos.append(img_info)
+
+            result[album_name] = {
+                'name': album_name,
+                'path': album_path,
+                'photos': processed_photos,
+                'subalbums': self._process_albums_recursive(
+                    album_info['subalbums'],
+                    album_path
+                ) if album_info['subalbums'] else {}
+            }
+
+        return result
 
     def build(self):
         """Main build process"""
@@ -278,22 +359,9 @@ class PhotfolioBuilder:
             print("No photos found! Add images to the photos/ directory.")
             return
 
-        print(f"Found {len(albums)} album(s):")
-        for album, photos in albums.items():
-            print(f"  - {album}: {len(photos)} photo(s)")
-
         # Process images
         print("\nProcessing images...")
-        albums_data = {}
-
-        for album_name, photo_paths in albums.items():
-            print(f"Processing album '{album_name}'...")
-            albums_data[album_name] = []
-
-            for idx, photo_path in enumerate(photo_paths, start=1):
-                print(f"  - {photo_path.name}")
-                img_info = self.process_image(photo_path, album_name, photo_index=idx)
-                albums_data[album_name].append(img_info)
+        albums_data = self._process_albums_recursive(albums)
 
         # Generate HTML
         print("\nGenerating HTML...")
