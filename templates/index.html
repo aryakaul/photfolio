@@ -31,7 +31,7 @@
         {% if albums|length == 1 and 'Main' in albums %}
             {# Single album - show photos directly #}
             <section class="gallery">
-                {% for photo in albums['Main'] %}
+                {% for photo in albums['Main'].photos %}
                 <div class="gallery-item">
                     <a href="#photo-{{ loop.index }}" class="photo-link">
                         <picture>
@@ -66,7 +66,7 @@
                             <a href="#photo-{{ loop.index - 1 }}" class="nav-prev">← Previous</a>
                             {% endif %}
 
-                            {% if loop.index < albums['Main']|length %}
+                            {% if loop.index < albums['Main'].photos|length %}
                             <a href="#photo-{{ loop.index + 1 }}" class="nav-next">Next →</a>
                             {% endif %}
                         </div>
@@ -77,25 +77,27 @@
         {% else %}
             {# Multiple albums - show album grid #}
             <div class="albums-grid">
-                {% for album_name, photos in albums.items() %}
+                {% for album_name, album_data in albums.items() %}
                 <article class="album-card">
-                    <a href="{{ album_name.lower().replace(' ', '-') }}.html" class="album-link">
+                    <a href="{{ (album_data.path | lower | replace(' ', '-') | replace('/', '-')) }}.html" class="album-link">
                         <div class="album-cover">
-                            {% set cover_photo = photos[0] %}
-                            <picture>
-                                {% if cover_photo.thumb_webp %}
-                                <source srcset="{{ cover_photo.thumb_webp }}" type="image/webp">
-                                {% endif %}
-                                <img
-                                    src="{{ cover_photo.thumb }}"
-                                    alt="{{ album_name }}"
-                                    {% if loop.index > 3 %}loading="lazy"{% endif %}
-                                >
-                            </picture>
+                            {% if album_data.photos %}
+                                {% set cover_photo = album_data.photos[0] %}
+                                <picture>
+                                    {% if cover_photo.thumb_webp %}
+                                    <source srcset="{{ cover_photo.thumb_webp }}" type="image/webp">
+                                    {% endif %}
+                                    <img
+                                        src="{{ cover_photo.thumb }}"
+                                        alt="{{ album_name }}"
+                                        {% if loop.index > 3 %}loading="lazy"{% endif %}
+                                    >
+                                </picture>
+                            {% endif %}
                         </div>
                         <div class="album-info">
                             <h2>{{ album_name }}</h2>
-                            <p class="album-count">{{ photos|length }} photo{% if photos|length != 1 %}s{% endif %}</p>
+                            <p class="album-count">{{ album_data.photos|length }} photo{% if album_data.photos|length != 1 %}s{% endif %}</p>
                         </div>
                     </a>
                 </article>
