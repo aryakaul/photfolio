@@ -76,6 +76,30 @@ class PhotfolioBuilder:
 
         return dict(albums)
 
+    def add_border_to_image(self, image, border_width):
+        """
+        Add white border to image using Pillow.
+
+        Args:
+            image: PIL Image object
+            border_width: Border width in pixels (0 = no border)
+
+        Returns:
+            PIL Image with border, or original image if border_width is 0
+        """
+        if border_width <= 0:
+            return image
+
+        try:
+            from PIL import ImageOps
+            # Add white border (RGB: 255, 255, 255)
+            bordered = ImageOps.expand(image, border=border_width, fill=(255, 255, 255))
+            return bordered
+        except Exception as e:
+            print(f"Warning: Failed to add border: {e}")
+            print("Continuing without border...")
+            return image
+
     def process_image(self, source_path, album_name, photo_index=1):
         """
         Process a single image: resize, optimize, strip EXIF
@@ -129,6 +153,15 @@ class PhotfolioBuilder:
 
             full_img.save(full_path, **save_kwargs)
 
+            # Apply border if configured
+            border_proportion = self.config['portfolio'].get('border_width', 0)
+            if border_proportion > 0:
+                with Image.open(full_path) as bordered_img:
+                    # Calculate border as percentage of smaller dimension
+                    border_px = int(min(bordered_img.width, bordered_img.height) * border_proportion)
+                    bordered_img = self.add_border_to_image(bordered_img, border_px)
+                    bordered_img.save(full_path, **save_kwargs)
+
             # Generate thumbnail
             thumb_img = img.copy()
             thumb_img.thumbnail((400, 400), Image.Resampling.LANCZOS)
@@ -137,6 +170,18 @@ class PhotfolioBuilder:
                 quality=self.config['portfolio']['thumbnail_quality'],
                 optimize=True
             )
+
+            # Apply border to thumbnail if configured
+            if border_proportion > 0:
+                with Image.open(thumb_path) as bordered_thumb:
+                    # Calculate border as percentage of smaller dimension
+                    border_px = int(min(bordered_thumb.width, bordered_thumb.height) * border_proportion)
+                    bordered_thumb = self.add_border_to_image(bordered_thumb, border_px)
+                    bordered_thumb.save(
+                        thumb_path,
+                        quality=self.config['portfolio']['thumbnail_quality'],
+                        optimize=True
+                    )
 
             # Generate WebP versions if enabled
             webp_full_path = None
@@ -147,6 +192,20 @@ class PhotfolioBuilder:
 
                 full_img.save(webp_full_path, 'WEBP', quality=90)
                 thumb_img.save(webp_thumb_path, 'WEBP', quality=80)
+
+                # Apply border to WebP versions if configured
+                if border_proportion > 0:
+                    with Image.open(webp_full_path) as bordered_webp:
+                        # Calculate border as percentage of smaller dimension
+                        border_px = int(min(bordered_webp.width, bordered_webp.height) * border_proportion)
+                        bordered_webp = self.add_border_to_image(bordered_webp, border_px)
+                        bordered_webp.save(webp_full_path, 'WEBP', quality=90)
+
+                    with Image.open(webp_thumb_path) as bordered_webp_thumb:
+                        # Calculate border as percentage of smaller dimension
+                        border_px = int(min(bordered_webp_thumb.width, bordered_webp_thumb.height) * border_proportion)
+                        bordered_webp_thumb = self.add_border_to_image(bordered_webp_thumb, border_px)
+                        bordered_webp_thumb.save(webp_thumb_path, 'WEBP', quality=80)
 
         # Build image info dictionary
         img_info = {
