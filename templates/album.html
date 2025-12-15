@@ -37,8 +37,8 @@
     <main>
         <section class="album-header">
             <h1>{{ album_name }}</h1>
-            {% if photos %}
-            <p class="photo-count">{{ photos|length }} photo{% if photos|length != 1 %}s{% endif %}</p>
+            {% if total_photos %}
+            <p class="photo-count">{{ total_photos }} photo{% if total_photos != 1 %}s{% endif %}</p>
             {% endif %}
         </section>
 
@@ -51,8 +51,8 @@
                 <article class="album-card">
                     <a href="{{ (subalbum.path | lower | replace(' ', '-') | replace('/', '-')) }}.html" class="album-link">
                         <div class="album-cover">
-                            {% if subalbum.photos %}
-                                {% set cover_photo = subalbum.photos[0] %}
+                            {% if subalbum.cover_photo %}
+                                {% set cover_photo = subalbum.cover_photo %}
                                 <picture>
                                     {% if cover_photo.thumb_webp %}
                                     <source srcset="{{ cover_photo.thumb_webp }}" type="image/webp">
@@ -63,7 +63,7 @@
                         </div>
                         <div class="album-info">
                             <h2>{{ subalbum_name }}</h2>
-                            <p class="album-count">{{ subalbum.photos|length }} photo{% if subalbum.photos|length != 1 %}s{% endif %}</p>
+                            <p class="album-count">{{ subalbum.total_photos }} photo{% if subalbum.total_photos != 1 %}s{% endif %}</p>
                         </div>
                     </a>
                 </article>

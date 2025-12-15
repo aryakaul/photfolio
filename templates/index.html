@@ -81,8 +81,8 @@
                 <article class="album-card">
                     <a href="{{ (album_data.path | lower | replace(' ', '-') | replace('/', '-')) }}.html" class="album-link">
                         <div class="album-cover">
-                            {% if album_data.photos %}
-                                {% set cover_photo = album_data.photos[0] %}
+                            {% if album_data.cover_photo %}
+                                {% set cover_photo = album_data.cover_photo %}
                                 <picture>
                                     {% if cover_photo.thumb_webp %}
                                     <source srcset="{{ cover_photo.thumb_webp }}" type="image/webp">
@@ -97,7 +97,7 @@
                         </div>
                         <div class="album-info">
                             <h2>{{ album_name }}</h2>
-                            <p class="album-count">{{ album_data.photos|length }} photo{% if album_data.photos|length != 1 %}s{% endif %}</p>
+                            <p class="album-count">{{ album_data.total_photos }} photo{% if album_data.total_photos != 1 %}s{% endif %}</p>
                         </div>
                     </a>
                 </article>

@@ -10,6 +10,15 @@ site:
   # Subtitle shown on homepage (supports {author} placeholder)
   subtitle: "by {author}"
 
+  # Base path for images in HTML (URL path, not filesystem path)
+  # Used when directories.images is separate from directories.target
+  # Examples:
+  #   "images" - relative path (default, for images in same directory)
+  #   "/images" - absolute path from web root
+  #   "https://cdn.example.com/photos" - full URL for CDN
+  # Configure your web server to serve directories.images at this path
+  images_base_path: "images"
+
   # Favicon (website icon)
   # Path relative to assets directory (e.g., "favicon.png")
   # Leave empty ("") to use the default embedded icon
@@ -22,9 +31,15 @@ directories:
   # Can be absolute path or relative to project root
   source: "photos"
 
-  # Target directory for generated static site
+  # Target directory for generated static site (HTML/CSS/assets)
   # Can be absolute path or relative to project root
   target: "docs"
+
+  # Directory for processed images (separate from HTML/CSS)
+  # If not specified, images are output to {target}/images
+  # Can be absolute path or relative to project root
+  # Example: "/mnt/blockstorage/modded_photos"
+  images: ""
 
 # Portfolio Settings
 portfolio:
@@ -102,6 +117,13 @@ albums:
 
   # Show album descriptions from album.txt files
   show_descriptions: true
+
+# Build Settings
+build:
+  # Use incremental builds (skip processing if outputs are up-to-date)
+  # Set to false for always-clean builds (previous behavior)
+  # Can be overridden with --force flag for full rebuilds
+  incremental: true
 
 # Advanced Settings
 advanced:
