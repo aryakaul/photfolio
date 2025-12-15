@@ -273,24 +273,46 @@ main {
 /* Lightbox Navigation */
 .lightbox-nav {
     position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
     display: flex;
-    gap: 2rem;
+    justify-content: space-between;
+    padding: 0 1rem;
+    pointer-events: none;
     z-index: 1001;
 }
 
 .lightbox-nav a {
+    pointer-events: auto;
     background-color: rgba(255, 255, 255, 0.1);
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s;
-    font-size: 0.9rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s, transform 0.2s;
+    font-size: 1.5rem;
+    font-weight: 300;
+    user-select: none;
 }
 
 .lightbox-nav a:hover {
     background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.lightbox-nav a:active {
+    transform: scale(0.95);
+}
+
+.nav-prev {
+    margin-right: auto;
+}
+
+.nav-next {
+    margin-left: auto;
 }
 
 /* Photo Metadata (if enabled) */
@@ -442,13 +464,13 @@ main {
     }
 
     .lightbox-nav {
-        bottom: 1rem;
-        gap: 1rem;
+        padding: 0 0.5rem;
     }
 
     .lightbox-nav a {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
     }
 
     .footer-content {

@@ -63,11 +63,11 @@
                         {# Navigation between photos #}
                         <div class="lightbox-nav">
                             {% if loop.index > 1 %}
-                            <a href="#photo-{{ loop.index - 1 }}" class="nav-prev">← Previous</a>
+                            <a href="#photo-{{ loop.index - 1 }}" class="nav-prev">&lt;</a>
                             {% endif %}
 
                             {% if loop.index < albums.photos|length %}
-                            <a href="#photo-{{ loop.index + 1 }}" class="nav-next">Next →</a>
+                            <a href="#photo-{{ loop.index + 1 }}" class="nav-next">&gt;</a>
                             {% endif %}
                         </div>
                     </div>
@@ -185,6 +185,55 @@
 
             window.location.hash = '#photo-' + nextIndex;
         });
+
+        // Touch/swipe navigation for mobile
+        (function() {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            const minSwipeDistance = 50;
+
+            {% if albums.get('_single_album') %}
+            const totalPhotos = {{ albums.photos|length }};
+            {% else %}
+            const totalPhotos = 0;
+            {% endif %}
+
+            if (totalPhotos === 0) return;
+
+            document.addEventListener('touchstart', function(e) {
+                if (!window.location.hash.startsWith('#photo-')) return;
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            document.addEventListener('touchend', function(e) {
+                if (!window.location.hash.startsWith('#photo-')) return;
+
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const currentHash = window.location.hash;
+                const match = currentHash.match(/#photo-(\d+)/);
+                if (!match) return;
+
+                const currentIndex = parseInt(match[1]);
+                const swipeDistance = touchEndX - touchStartX;
+
+                if (Math.abs(swipeDistance) < minSwipeDistance) return;
+
+                let nextIndex;
+                if (swipeDistance > 0) {
+                    // Swipe right - previous photo
+                    nextIndex = currentIndex > 1 ? currentIndex - 1 : totalPhotos;
+                } else {
+                    // Swipe left - next photo
+                    nextIndex = currentIndex < totalPhotos ? currentIndex + 1 : 1;
+                }
+
+                window.location.hash = '#photo-' + nextIndex;
+            }
+        })();
     </script>
 </body>
 </html>
