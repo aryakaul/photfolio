@@ -28,10 +28,10 @@
     </header>
 
     <main class="albums-container">
-        {% if albums|length == 1 and 'Main' in albums %}
+        {% if albums.get('_single_album') %}
             {# Single album - show photos directly #}
             <section class="gallery">
-                {% for photo in albums['Main'].photos %}
+                {% for photo in albums.photos %}
                 <div class="gallery-item">
                     <a href="#photo-{{ loop.index }}" class="photo-link">
                         <picture>
@@ -66,7 +66,7 @@
                             <a href="#photo-{{ loop.index - 1 }}" class="nav-prev">← Previous</a>
                             {% endif %}
 
-                            {% if loop.index < albums['Main'].photos|length %}
+                            {% if loop.index < albums.photos|length %}
                             <a href="#photo-{{ loop.index + 1 }}" class="nav-next">Next →</a>
                             {% endif %}
                         </div>
@@ -161,8 +161,8 @@
             }
 
             const currentIndex = parseInt(match[1]);
-            {% if albums|length == 1 and 'Main' in albums %}
-            const totalPhotos = {{ albums['Main']|length }};
+            {% if albums.get('_single_album') %}
+            const totalPhotos = {{ albums.photos|length }};
             {% else %}
             const totalPhotos = 0; // No keyboard nav on album grid page
             {% endif %}

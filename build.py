@@ -46,7 +46,7 @@ class PhotfolioBuilder:
     def scan_photos(self):
         """
         Scan photos/ directory and organize into nested album structure
-        Returns: dict of nested albums
+        Returns: dict of nested albums (or special single-album structure)
         """
         albums = {}
         extensions = tuple(self.config['advanced']['image_extensions'])
@@ -65,6 +65,12 @@ class PhotfolioBuilder:
 
                 relative = item.relative_to(self.photos_dir)
                 self._add_photo_to_nested_structure(albums, relative, item)
+
+        # Special case: if ONLY root photos exist (no subdirectory albums),
+        # convert "Main" album to a single-album portfolio
+        if len(albums) == 1 and 'Main' in albums:
+            # Return the Main album photos directly as a single-album structure
+            return {'_single_album': True, 'photos': albums['Main']['photos']}
 
         return albums
 
@@ -267,8 +273,10 @@ class PhotfolioBuilder:
         with open(self.build_dir / 'index.html', 'w') as f:
             f.write(html)
 
-        # Recursively render all album pages
-        self._render_album_pages(albums_data, albums_data)
+        # Only render album pages if we have multiple albums
+        # (single-album portfolios show all photos on index.html)
+        if not albums_data.get('_single_album'):
+            self._render_album_pages(albums_data, albums_data)
 
     def _render_album_pages(self, current_level, all_albums):
         """Recursively generate HTML for each album"""
@@ -359,9 +367,20 @@ class PhotfolioBuilder:
             print("No photos found! Add images to the photos/ directory.")
             return
 
-        # Process images
-        print("\nProcessing images...")
-        albums_data = self._process_albums_recursive(albums)
+        # Handle special case: single album (root photos only)
+        if albums.get('_single_album'):
+            print("\nProcessing single-album portfolio...")
+            processed_photos = []
+            for idx, photo_path in enumerate(albums['photos'], start=1):
+                print(f"  - {photo_path.name}")
+                img_info = self.process_image(photo_path, '', photo_index=idx)
+                processed_photos.append(img_info)
+
+            albums_data = {'_single_album': True, 'photos': processed_photos}
+        else:
+            # Process images
+            print("\nProcessing images...")
+            albums_data = self._process_albums_recursive(albums)
 
         # Generate HTML
         print("\nGenerating HTML...")
