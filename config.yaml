@@ -92,8 +92,8 @@ footer:
       url: "https://instagram.com/yourhandle"
     - label: "Email"
       url: "mailto:your@email.com"
-    # - label: "Website"
-    #   url: "https://yourwebsite.com"
+    - label: "Website"
+      url: "https://yourwebsite.com"
 
 # Album Settings
 albums:
